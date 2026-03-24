@@ -8,22 +8,21 @@ import { ProjectsBoard } from './components/ProjectsBoard';
 import { TrainingTimeline as TrainingCinematic } from './components/TrainingCinematic';
 import { EducationTimeline } from './components/Timeline';
 import { Certifications, Achievements, ExtraActivities } from './components/MoreSections';
-import { HexDecoder } from './components/HexDecoder';
 import { CyberAvatar } from './components/CyberAvatar';
 import { CursorGlow } from './components/CursorGlow';
 import { MatrixRain } from './components/MatrixRain';
 import { AcademicTimeline } from './components/AcademicTimeline';
 import { ContactPage } from './components/ContactPage';
+import { BeyondSection } from './components/BeyondSection';
 
 // Page Views
 const DashboardView = () => (
   <>
     <Hero />
-    <HexDecoder />
   </>
 );
 
-const CapabilitiesView = () => (
+const SkillsView = () => (
   <>
     <SkillsGrid />
     <SkillRadar />
@@ -58,19 +57,20 @@ function App() {
         <ParticleBackground />
         <MatrixRain />
         <Navigation />
-        
+
         <main className="relative z-10 pt-24 pb-20">
           <Routes>
             <Route path="/" element={<DashboardView />} />
-            <Route path="/capabilities" element={<CapabilitiesView />} />
+            <Route path="/capabilities" element={<SkillsView />} />
             <Route path="/modules" element={<ModulesView />} />
             <Route path="/activity" element={<ActivityView />} />
             <Route path="/verification" element={<VerificationView />} />
             <Route path="/education" element={<AcademicTimeline />} />
+            <Route path="/beyond" element={<BeyondSection />} />
             <Route path="/contact" element={<ContactPage />} />
           </Routes>
         </main>
-        
+
         <CyberAvatar />
         <CursorGlow />
       </div>

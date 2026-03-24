@@ -6,11 +6,12 @@ import { Link, useLocation } from 'react-router-dom';
 
 const navItems = [
   { name: 'Dashboard', path: '/' },
-  { name: 'Capabilities', path: '/capabilities' },
+  { name: 'Skills', path: '/capabilities' },
   { name: 'Modules', path: '/modules' },
   { name: 'Activity', path: '/activity' },
   { name: 'Verification', path: '/verification' },
   { name: 'Academic Timeline', path: '/education' },
+  { name: 'Beyond', path: '/beyond' },
   { name: 'Contact', path: '/contact' },
 ];
 
