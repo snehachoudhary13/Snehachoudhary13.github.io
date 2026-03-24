@@ -3,8 +3,30 @@ import { Award, Trophy, HeartHandshake, ShieldCheck, Target, BadgeCheck, Loader2
 
 export const Certifications = () => {
   const verifiedCerts = [
-    { title: "Java (Basic)", issuer: "HackerRank", icon: <ShieldCheck className="w-8 h-8 text-cyber-primary" /> },
-    { title: "Cloud Computing", issuer: "NPTEL", icon: <ShieldCheck className="w-8 h-8 text-cyber-primary" /> },
+    {
+      title: "Java (Basic)",
+      issuer: "HackerRank",
+      icon: <ShieldCheck className="w-8 h-8 text-cyber-primary" />,
+      image: null,
+    },
+    {
+      title: "Cloud Computing",
+      issuer: "NPTEL",
+      icon: <ShieldCheck className="w-8 h-8 text-cyber-primary" />,
+      image: null,
+    },
+    {
+      title: "Build Generative AI Apps & Solutions with No-Code Tools",
+      issuer: "Infosys Springboard",
+      icon: <ShieldCheck className="w-8 h-8 text-cyber-primary" />,
+      image: "https://iili.io/q6RszDF.png",
+    },
+    {
+      title: "Waste Warriors NGO Training",
+      issuer: "Waste Warriors",
+      icon: <ShieldCheck className="w-8 h-8 text-cyber-accent" />,
+      image: "https://jumpshare.com/s/sVA9kVhVVnL9gsjYnlKF",
+    },
   ];
 
   const inProgressCerts = [
@@ -55,7 +77,7 @@ export const Certifications = () => {
                 viewport={{ once: true }}
                 transition={{ delay: idx * 0.1 }}
                 whileHover={{ scale: 1.02 }}
-                className="glass-panel p-8 flex flex-col items-center justify-center text-center group cursor-default relative overflow-hidden border-cyber-primary/30 hover:border-cyber-primary bg-cyber-panel transition-all duration-300"
+                className="glass-panel flex flex-col items-center justify-center text-center group cursor-default relative overflow-hidden border-cyber-primary/30 hover:border-cyber-primary bg-cyber-panel transition-all duration-300"
               >
                 <div className="shimmer-overlay"></div>
                 
@@ -63,21 +85,35 @@ export const Certifications = () => {
                   <BadgeCheck className="w-4 h-4 text-cyber-primary" />
                   <span className="text-xs font-mono text-cyber-primary uppercase tracking-wider">Verified</span>
                 </div>
-                
-                {/* Hexagonal motif behind icon */}
-                <div className="relative w-28 h-28 flex items-center justify-center mb-6">
-                  <svg className="absolute inset-0 w-full h-full text-cyber-primary/10 group-hover:text-cyber-primary/30 transition-colors drop-shadow-[0_0_15px_rgba(0,212,255,0.2)]" viewBox="0 0 100 100" fill="currentColor">
-                    <polygon points="50 3 93 28 93 72 50 97 7 72 7 28"></polygon>
-                  </svg>
-                  <div className="relative z-10 w-16 h-16 rounded-full bg-cyber-bg border border-cyber-primary/50 flex items-center justify-center group-hover:shadow-[0_0_20px_rgba(0,212,255,0.5)] transition-shadow">
-                    {cert.icon}
-                  </div>
-                </div>
 
-                <h3 className="text-xl font-mono text-slate-100 mb-3 z-10">{cert.title}</h3>
-                <div className="flex items-center gap-2 mt-auto z-10 bg-black/40 px-4 py-2 rounded-md border border-slate-800">
-                  <span className="text-xs text-slate-400 font-mono tracking-widest uppercase">Issuer:</span>
-                  <span className="text-sm text-cyber-primary font-mono tracking-widest">{cert.issuer}</span>
+                {/* Cert image OR icon */}
+                {cert.image ? (
+                  <div className="w-full aspect-video overflow-hidden bg-[#030712] relative">
+                    <img
+                      src={cert.image}
+                      alt={cert.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-cyber-bg/80 to-transparent pointer-events-none" />
+                  </div>
+                ) : (
+                  <div className="relative w-28 h-28 flex items-center justify-center mt-8 mb-2">
+                    <svg className="absolute inset-0 w-full h-full text-cyber-primary/10 group-hover:text-cyber-primary/30 transition-colors drop-shadow-[0_0_15px_rgba(0,212,255,0.2)]" viewBox="0 0 100 100" fill="currentColor">
+                      <polygon points="50 3 93 28 93 72 50 97 7 72 7 28"></polygon>
+                    </svg>
+                    <div className="relative z-10 w-16 h-16 rounded-full bg-cyber-bg border border-cyber-primary/50 flex items-center justify-center group-hover:shadow-[0_0_20px_rgba(0,212,255,0.5)] transition-shadow">
+                      {cert.icon}
+                    </div>
+                  </div>
+                )}
+
+                <div className="p-6 pt-3 w-full">
+                  <h3 className="text-base font-mono text-slate-100 mb-3 z-10 leading-snug">{cert.title}</h3>
+                  <div className="flex items-center gap-2 mt-auto z-10 bg-black/40 px-4 py-2 rounded-md border border-slate-800 justify-center">
+                    <span className="text-xs text-slate-400 font-mono tracking-widest uppercase">Issuer:</span>
+                    <span className="text-sm text-cyber-primary font-mono tracking-widest">{cert.issuer}</span>
+                  </div>
                 </div>
               </motion.div>
             ))}
@@ -159,9 +195,9 @@ export const Certifications = () => {
 
 export const Achievements = () => {
   const achievements = [
-    { title: "Top 50", desc: "HackWithVertos 1.0 Hackathon", icon: <Trophy className="w-10 h-10 text-cyber-secondary" /> },
-    { title: "3⭐", desc: "HackerRank (Problem Solving)", icon: <Target className="w-10 h-10 text-cyber-secondary" /> },
-    { title: "Top 20%", desc: "on TryHackMe", icon: <ShieldCheck className="w-10 h-10 text-cyber-secondary" /> },
+    { title: "Top 50", desc: "HackWithVertos 1.0 Hackathon", icon: <Trophy className="w-10 h-10 text-cyber-secondary" />, certImg: "https://iili.io/q6oq5ru.png", certLink: "https://freeimage.host/i/q6oq5ru" },
+    { title: "3⭐", desc: "HackerRank (Problem Solving)", icon: <Target className="w-10 h-10 text-cyber-secondary" />, certImg: null, certLink: null },
+    { title: "Top 20%", desc: "on TryHackMe", icon: <ShieldCheck className="w-10 h-10 text-cyber-secondary" />, certImg: null, certLink: null },
   ];
 
   return (
@@ -185,13 +221,30 @@ export const Achievements = () => {
               viewport={{ once: true }}
               transition={{ delay: idx * 0.1 }}
               whileHover={{ y: -5 }}
-              className="glass-panel p-8 flex flex-col items-center justify-center text-center group cursor-default border-cyber-secondary/30 hover:border-cyber-secondary shadow-none hover:shadow-glow-secondary"
+              className="glass-panel flex flex-col items-center justify-center text-center group cursor-default border-cyber-secondary/30 hover:border-cyber-secondary shadow-none hover:shadow-glow-secondary overflow-hidden"
             >
-              <div className="mb-6 bg-cyber-bg p-4 rounded-full border border-slate-800 group-hover:border-cyber-secondary/50 transition-colors">
-                {item.icon}
+              {/* Certificate image thumbnail if available */}
+              {item.certImg && (
+                <a href={item.certLink!} target="_blank" rel="noopener noreferrer" className="w-full block overflow-hidden">
+                  <div className="w-full aspect-video overflow-hidden bg-[#030712] relative">
+                    <img
+                      src={item.certImg}
+                      alt={item.desc}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-cyber-bg/70 to-transparent pointer-events-none" />
+                    <div className="absolute bottom-2 right-2 font-mono text-[10px] text-cyber-secondary/80 bg-black/60 px-2 py-0.5 rounded">View cert →</div>
+                  </div>
+                </a>
+              )}
+              <div className="p-8 flex flex-col items-center w-full">
+                <div className="mb-6 bg-cyber-bg p-4 rounded-full border border-slate-800 group-hover:border-cyber-secondary/50 transition-colors">
+                  {item.icon}
+                </div>
+                <h3 className="text-4xl font-bold font-mono text-transparent bg-clip-text bg-gradient-to-br from-cyber-secondary to-cyber-primary mb-3 text-glow">{item.title}</h3>
+                <p className="text-sm text-slate-300 font-mono tracking-wide">{item.desc}</p>
               </div>
-              <h3 className="text-4xl font-bold font-mono text-transparent bg-clip-text bg-gradient-to-br from-cyber-secondary to-cyber-primary mb-3 text-glow">{item.title}</h3>
-              <p className="text-sm text-slate-300 font-mono tracking-wide">{item.desc}</p>
             </motion.div>
           ))}
         </div>

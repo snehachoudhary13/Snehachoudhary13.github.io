@@ -2,49 +2,58 @@ import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const SKILL_SPOTS = [
-  { id: 0, x: 18, y: 28, category: 'Programming', skills: ['C', 'C++', 'Python'], color: '#00d4ff' },
-  { id: 1, x: 42, y: 55, category: 'Tools & Platforms', skills: ['Git', 'GitHub', 'VS Code', 'Kali Linux'], color: '#818cf8' },
-  { id: 2, x: 65, y: 32, category: 'Core Concepts', skills: ['DSA', 'OOPS', 'DBMS', 'OS', 'Networks'], color: '#2dd4bf' },
-  { id: 3, x: 80, y: 62, category: 'Cybersecurity', skills: ['Nmap', 'Wireshark', 'Metasploit', 'OSINT'], color: '#f59e0b' },
-  { id: 4, x: 30, y: 75, category: 'Soft Skills', skills: ['Adaptability', 'Team Player', 'Discipline', 'Leadership'], color: '#e879f9' },
+  { id: 0, x: 14, y: 22, category: 'Programming', skills: ['C', 'C++', 'Python'], color: '#00d4ff' },
+  { id: 1, x: 38, y: 58, category: 'Tools & Platforms', skills: ['Git', 'GitHub', 'VS Code', 'Kali Linux'], color: '#818cf8' },
+  { id: 2, x: 60, y: 26, category: 'Core Concepts', skills: ['DSA', 'OOPS', 'DBMS', 'OS', 'Networks'], color: '#2dd4bf' },
+  { id: 3, x: 78, y: 65, category: 'Cybersecurity', skills: ['Nmap', 'Wireshark', 'Metasploit', 'OSINT'], color: '#f59e0b' },
+  { id: 4, x: 25, y: 78, category: 'Soft Skills', skills: ['Adaptability', 'Team Player', 'Discipline', 'Leadership'], color: '#e879f9' },
 ];
 
-// SVG Camera mounted on wall bracket
-const CCTVCamera = ({ angle }: { angle: number }) => (
-  <svg width="120" height="100" viewBox="0 0 120 100" fill="none" xmlns="http://www.w3.org/2000/svg"
-    style={{ filter: 'drop-shadow(0 0 12px rgba(0,212,255,0.4))' }}>
-    {/* Wall plate */}
-    <rect x="85" y="10" width="28" height="60" rx="4" fill="#1e293b" stroke="#334155" strokeWidth="1.5" />
-    {/* Bracket arm */}
-    <rect x="65" y="38" width="24" height="6" rx="3" fill="#334155" />
-    {/* Camera body - rotates */}
-    <g transform={`rotate(${angle}, 62, 42)`}>
-      <rect x="15" y="32" width="52" height="20" rx="6" fill="#1e293b" stroke="#00d4ff" strokeWidth="1" />
-      {/* Lens housing */}
-      <circle cx="20" cy="42" r="10" fill="#0a0f16" stroke="#00d4ff" strokeWidth="1.5" />
-      {/* Lens */}
-      <circle cx="20" cy="42" r="6" fill="#060a10" />
-      <circle cx="20" cy="42" r="4" fill="#00d4ff" opacity="0.15" />
-      <circle cx="20" cy="42" r="2" fill="#00d4ff" opacity="0.5" />
-      {/* IR LEDs */}
-      {[0, 1, 2, 3].map(i => (
-        <circle key={i} cx={32 + i * 8} cy={36} r={2} fill="#ff4444" opacity={0.7}>
-          <animate attributeName="opacity" values="0.7;0.2;0.7" dur={`${1 + i * 0.3}s`} repeatCount="indefinite" />
-        </circle>
-      ))}
-      {/* Status light */}
-      <circle cx="60" cy="42" r="2.5" fill="#22c55e">
-        <animate attributeName="opacity" values="1;0.3;1" dur="2s" repeatCount="indefinite" />
-      </circle>
-    </g>
+// Gun-scope / sniper reticle SVG component
+const SniperReticle = ({ color, active, blinking }: { color: string; active: boolean; blinking: boolean }) => (
+  <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg"
+    style={{ filter: `drop-shadow(0 0 ${active ? '10px' : '5px'} ${color})` }}>
+    {/* Outer circle */}
+    <circle cx="20" cy="20" r="18" stroke={color} strokeWidth={active ? 1.5 : 1} opacity={blinking ? 1 : 0.7} />
+    {/* Inner dot */}
+    <circle cx="20" cy="20" r="4" fill={color} opacity={blinking ? 1 : 0.6} />
+    {/* Cross hairs */}
+    <line x1="20" y1="2" x2="20" y2="14" stroke={color} strokeWidth="1.5" />
+    <line x1="20" y1="26" x2="20" y2="38" stroke={color} strokeWidth="1.5" />
+    <line x1="2" y1="20" x2="14" y2="20" stroke={color} strokeWidth="1.5" />
+    <line x1="26" y1="20" x2="38" y2="20" stroke={color} strokeWidth="1.5" />
+    {/* Inner ring */}
+    <circle cx="20" cy="20" r="10" stroke={color} strokeWidth="1" strokeDasharray="3 3" opacity={0.7} />
+    {/* Corner tick marks */}
+    {active && (
+      <>
+        <line x1="6" y1="6" x2="10" y2="6" stroke={color} strokeWidth="1.5" />
+        <line x1="6" y1="6" x2="6" y2="10" stroke={color} strokeWidth="1.5" />
+        <line x1="34" y1="6" x2="30" y2="6" stroke={color} strokeWidth="1.5" />
+        <line x1="34" y1="6" x2="34" y2="10" stroke={color} strokeWidth="1.5" />
+        <line x1="6" y1="34" x2="10" y2="34" stroke={color} strokeWidth="1.5" />
+        <line x1="6" y1="34" x2="6" y2="30" stroke={color} strokeWidth="1.5" />
+        <line x1="34" y1="34" x2="30" y2="34" stroke={color} strokeWidth="1.5" />
+        <line x1="34" y1="34" x2="34" y2="30" stroke={color} strokeWidth="1.5" />
+      </>
+    )}
   </svg>
 );
 
 export const SkillsGrid = () => {
   const [activeSpot, setActiveSpot] = useState<number | null>(null);
   const [cameraAngle, setCameraAngle] = useState(0);
-  const arenaRef = useRef<HTMLDivElement>(null);
-  const [spotlight, setSpotlight] = useState<{ x: number; y: number } | null>(null);
+  const [spotlight, setSpotlight] = useState<{ x: number; y: number; color: string } | null>(null);
+  const [blinkStates, setBlinkStates] = useState<boolean[]>(SKILL_SPOTS.map(() => true));
+  const tickRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // Randomly blink the dots
+  useEffect(() => {
+    tickRef.current = setInterval(() => {
+      setBlinkStates(prev => prev.map((_, i) => (i === activeSpot ? true : Math.random() > 0.3)));
+    }, 600);
+    return () => { if (tickRef.current) clearInterval(tickRef.current); };
+  }, [activeSpot]);
 
   const handleSpotClick = (spot: typeof SKILL_SPOTS[0]) => {
     if (activeSpot === spot.id) {
@@ -53,11 +62,10 @@ export const SkillsGrid = () => {
       setCameraAngle(0);
       return;
     }
-    // Camera pans toward the spot: map x% to angle range -25..+25
-    const targetAngle = ((spot.x - 50) / 50) * 22;
+    const targetAngle = ((spot.x - 50) / 50) * 30;
     setCameraAngle(targetAngle);
     setActiveSpot(spot.id);
-    setSpotlight({ x: spot.x, y: spot.y });
+    setSpotlight({ x: spot.x, y: spot.y, color: spot.color });
   };
 
   const activeSkill = SKILL_SPOTS.find(s => s.id === activeSpot);
@@ -68,7 +76,7 @@ export const SkillsGrid = () => {
         {/* Section Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
-          className="mb-12 text-center"
+          className="mb-10 text-center"
         >
           <div className="inline-flex items-center gap-2 bg-red-500/10 border border-red-500/30 rounded-full px-4 py-1.5 mb-4">
             <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
@@ -78,100 +86,133 @@ export const SkillsGrid = () => {
           <p className="text-slate-500 font-mono text-sm">Target the red dots to reveal classified skill data</p>
         </motion.div>
 
-        {/* Main Arena */}
+        {/* Main container - camera + dark arena side by side on large screens */}
         <div className="relative">
-          {/* Camera mounted top-right */}
-          <div className="absolute -top-6 right-4 z-30">
-            <motion.div animate={{ rotate: cameraAngle }} transition={{ type: 'spring', stiffness: 60, damping: 12 }}
-              style={{ transformOrigin: '88px 42px' }}>
-              <CCTVCamera angle={0} />
-            </motion.div>
-            {/* Camera scan line */}
+          
+          {/* ── CCTV Camera — blends into the wall corner ── */}
+          <div className="absolute -top-2 right-0 z-30 pointer-events-none select-none"
+            style={{ width: '200px' }}>
+            {/* Wall plate / mount */}
+            <div className="absolute top-0 right-0 w-full h-full"
+              style={{ background: 'linear-gradient(135deg, #0d1117 60%, transparent 100%)', borderRadius: '0 0 0 16px', opacity: 0.85 }} />
+            {/* Camera image rotates to track clicked spot */}
             <motion.div
-              className="absolute top-10 right-14 w-px opacity-20"
-              style={{ height: '200px', background: 'linear-gradient(to bottom, #00d4ff, transparent)' }}
+              animate={{ rotate: cameraAngle }}
+              transition={{ type: 'spring', stiffness: 50, damping: 14 }}
+              style={{ transformOrigin: '170px 30px' }}
+            >
+              <img
+                src="/cctv_camera.png"
+                alt="CCTV Camera"
+                className="w-full object-contain"
+                style={{
+                  filter: 'drop-shadow(0 0 20px rgba(0,212,255,0.35)) brightness(0.9)',
+                  mixBlendMode: 'screen',
+                  maxHeight: '160px',
+                }}
+              />
+            </motion.div>
+            {/* Scan beam from camera lens */}
+            <motion.div
+              className="absolute pointer-events-none"
+              style={{ top: '50px', right: '170px', width: '200px', height: '2px',
+                background: 'linear-gradient(to left, rgba(0,212,255,0.5), transparent)',
+                transformOrigin: 'right center' }}
               animate={{ rotate: [-15 + cameraAngle, 15 + cameraAngle, -15 + cameraAngle] }}
-              transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+              transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
             />
           </div>
 
-          {/* Dark arena */}
+          {/* ── Dark surveillance arena ── */}
           <div
-            ref={arenaRef}
-            className="relative w-full overflow-hidden rounded-xl border border-slate-800"
-            style={{ minHeight: '420px', background: '#020509' }}
+            className="relative w-full overflow-hidden rounded-xl border border-slate-800/60"
+            style={{
+              minHeight: '520px',
+              background: 'radial-gradient(ellipse at 80% 0%, #040a14 0%, #020509 60%, #010305 100%)',
+            }}
           >
             {/* Scanlines overlay */}
-            <div className="absolute inset-0 pointer-events-none z-20 opacity-10"
-              style={{ backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.5) 2px, rgba(0,0,0,0.5) 4px)' }} />
+            <div className="absolute inset-0 pointer-events-none z-20 opacity-[0.06]"
+              style={{ backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.8) 2px, rgba(0,0,0,0.8) 4px)' }} />
 
-            {/* CCTV timestamp */}
-            <div className="absolute top-3 left-4 font-mono text-xs text-red-500/70 z-20 flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse inline-block" />
-              REC ● CAM-01 · {new Date().toLocaleTimeString()}
+            {/* Noise texture */}
+            <div className="absolute inset-0 pointer-events-none z-10 opacity-[0.03]"
+              style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 256 256\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noise\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.9\' numOctaves=\'4\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noise)\' opacity=\'1\'/%3E%3C/svg%3E")' }} />
+
+            {/* CCTV header bar */}
+            <div className="absolute top-3 left-4 font-mono text-xs z-30 flex items-center gap-3 text-red-500/60">
+              <span className="flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
+                REC ●
+              </span>
+              <span className="text-slate-600">CAM-01</span>
+              <span className="text-slate-700">{new Date().toLocaleTimeString()}</span>
             </div>
+            {/* Corner bracket decorations */}
+            {[
+              'top-2 left-2 border-t border-l',
+              'top-2 right-2 border-t border-r',
+              'bottom-2 left-2 border-b border-l',
+              'bottom-2 right-2 border-b border-r',
+            ].map((cls, i) => (
+              <div key={i} className={`absolute w-5 h-5 border-slate-700/60 ${cls}`} />
+            ))}
 
-            {/* Spotlight that follows cursor/click */}
+            {/* Spotlight radial glow following clicked dot */}
             <AnimatePresence>
               {spotlight && (
                 <motion.div
                   key="spotlight"
-                  initial={{ opacity: 0, scale: 0.5 }}
-                  animate={{ opacity: 1, scale: 1 }}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  className="absolute pointer-events-none z-10 rounded-full"
+                  className="absolute pointer-events-none z-10"
                   style={{
-                    left: `${spotlight.x}%`,
-                    top: `${spotlight.y}%`,
+                    left: `${spotlight.x}%`, top: `${spotlight.y}%`,
                     transform: 'translate(-50%, -50%)',
-                    width: '260px',
-                    height: '260px',
-                    background: `radial-gradient(circle, ${activeSkill?.color ?? '#00d4ff'}25 0%, ${activeSkill?.color ?? '#00d4ff'}08 40%, transparent 70%)`,
-                    boxShadow: `0 0 60px ${activeSkill?.color ?? '#00d4ff'}30`,
+                    width: '320px', height: '320px',
+                    background: `radial-gradient(circle, ${spotlight.color}20 0%, ${spotlight.color}08 40%, transparent 70%)`,
+                    boxShadow: `0 0 80px ${spotlight.color}20`,
                   }}
                 />
               )}
             </AnimatePresence>
 
-            {/* Red dot target spots */}
+            {/* Sniper reticle dots */}
             {SKILL_SPOTS.map((spot) => (
               <motion.button
                 key={spot.id}
-                className="absolute z-20 group cursor-crosshair"
+                className="absolute z-20 cursor-crosshair group"
                 style={{ left: `${spot.x}%`, top: `${spot.y}%`, transform: 'translate(-50%, -50%)' }}
                 onClick={() => handleSpotClick(spot)}
-                whileHover={{ scale: 1.2 }}
+                whileHover={{ scale: 1.25 }}
               >
-                {/* Outer ring pulse */}
+                {/* Outer pulsing ring */}
                 <motion.div
                   className="absolute inset-0 rounded-full"
-                  style={{ background: 'transparent', border: `2px solid ${activeSpot === spot.id ? spot.color : '#ef4444'}` }}
-                  animate={{ scale: [1, 1.8, 1], opacity: [1, 0, 1] }}
-                  transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+                  animate={{ scale: [1, 2.2, 1], opacity: [0.6, 0, 0.6] }}
+                  transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut', delay: spot.id * 0.3 }}
+                  style={{ border: `2px solid ${activeSpot === spot.id ? spot.color : '#ef4444'}`, borderRadius: '50%',
+                    width: '40px', height: '40px', top: '0', left: '0' }}
                 />
-                {/* Red dot core */}
-                <div
-                  className="w-4 h-4 rounded-full relative z-10 transition-all duration-300"
-                  style={{
-                    background: activeSpot === spot.id ? spot.color : '#ef4444',
-                    boxShadow: activeSpot === spot.id
-                      ? `0 0 16px ${spot.color}, 0 0 32px ${spot.color}60`
-                      : '0 0 8px #ef4444, 0 0 16px #ef444460',
-                  }}
-                />
-                {/* Crosshair lines */}
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity">
-                  <div className="w-8 h-px bg-red-400 absolute -translate-x-1/2 -translate-y-1/2" />
-                  <div className="w-px h-8 bg-red-400 absolute -translate-x-1/2 -translate-y-1/2" />
-                </div>
-                {/* Category label on hover */}
-                <div className="absolute -top-8 left-1/2 -translate-x-1/2 font-mono text-xs whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity text-slate-300 bg-black/70 px-2 py-0.5 rounded pointer-events-none">
+                <motion.div
+                  animate={{ opacity: blinkStates[spot.id] ? 1 : 0.15 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <SniperReticle
+                    color={activeSpot === spot.id ? spot.color : '#ef4444'}
+                    active={activeSpot === spot.id}
+                    blinking={blinkStates[spot.id]}
+                  />
+                </motion.div>
+                {/* Hover label */}
+                <div className="absolute -top-8 left-1/2 -translate-x-1/2 font-mono text-[10px] whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity text-slate-300 bg-black/80 border border-slate-700/50 px-2 py-0.5 rounded pointer-events-none">
                   {spot.category}
                 </div>
               </motion.button>
             ))}
 
-            {/* Skill card that appears on click */}
+            {/* Skill reveal card */}
             <AnimatePresence>
               {activeSpot !== null && activeSkill && (
                 <motion.div
@@ -179,30 +220,31 @@ export const SkillsGrid = () => {
                   initial={{ opacity: 0, scale: 0.7, filter: 'blur(12px)' }}
                   animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
                   exit={{ opacity: 0, scale: 0.8, filter: 'blur(8px)' }}
-                  transition={{ type: 'spring', stiffness: 200, damping: 20 }}
-                  className="absolute z-30 glass-panel p-6 shadow-2xl"
+                  transition={{ type: 'spring', stiffness: 250, damping: 22 }}
+                  className="absolute z-30 glass-panel p-6"
                   style={{
-                    left: `${Math.min(Math.max(activeSkill.x, 15), 65)}%`,
-                    top: `${Math.min(Math.max(activeSkill.y + 12, 10), 60)}%`,
+                    left: `${Math.min(Math.max(activeSkill.x, 18), 65)}%`,
+                    top: `${Math.min(Math.max(activeSkill.y + 14, 10), 62)}%`,
                     transform: 'translate(-50%, 0)',
-                    borderColor: `${activeSkill.color}60`,
+                    borderColor: `${activeSkill.color}50`,
                     minWidth: '200px',
-                    boxShadow: `0 0 30px ${activeSkill.color}30, inset 0 0 20px ${activeSkill.color}08`,
+                    boxShadow: `0 0 40px ${activeSkill.color}25, inset 0 0 20px ${activeSkill.color}05`,
                   }}
                 >
-                  <div className="font-mono text-xs mb-3 flex items-center gap-2" style={{ color: activeSkill.color }}>
-                    <span className="w-1.5 h-1.5 rounded-full animate-pulse inline-block" style={{ background: activeSkill.color }} />
-                    {activeSkill.category.toUpperCase()}
+                  {/* Header with target lock indicator */}
+                  <div className="font-mono text-[10px] mb-3 flex items-center gap-2 uppercase tracking-widest" style={{ color: activeSkill.color }}>
+                    <div className="w-2 h-2 rounded-full animate-pulse" style={{ background: activeSkill.color }} />
+                    TARGET LOCKED · {activeSkill.category}
                   </div>
                   <div className="flex flex-wrap gap-2">
                     {activeSkill.skills.map((skill, i) => (
                       <motion.span
                         key={skill}
-                        initial={{ opacity: 0, y: 8 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: i * 0.08 }}
-                        className="px-3 py-1.5 rounded font-mono text-sm border"
-                        style={{ borderColor: `${activeSkill.color}50`, color: activeSkill.color, background: `${activeSkill.color}10` }}
+                        initial={{ opacity: 0, y: 8, scale: 0.85 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        transition={{ delay: i * 0.07 }}
+                        className="px-3 py-1.5 rounded-sm font-mono text-sm border"
+                        style={{ borderColor: `${activeSkill.color}50`, color: activeSkill.color, background: `${activeSkill.color}12` }}
                       >
                         {skill}
                       </motion.span>
@@ -212,15 +254,15 @@ export const SkillsGrid = () => {
               )}
             </AnimatePresence>
 
-            {/* Center hint when nothing active */}
+            {/* Idle hint */}
             {activeSpot === null && (
-              <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
+              <div className="absolute inset-0 flex items-end justify-center pb-6 pointer-events-none z-10">
                 <motion.p
-                  animate={{ opacity: [0.3, 0.7, 0.3] }}
-                  transition={{ duration: 3, repeat: Infinity }}
-                  className="font-mono text-xs text-slate-600 tracking-widest uppercase"
+                  animate={{ opacity: [0.2, 0.5, 0.2] }}
+                  transition={{ duration: 3.5, repeat: Infinity }}
+                  className="font-mono text-[11px] text-slate-700 tracking-widest uppercase"
                 >
-                  ▶ Click the red dots to reveal skills
+                  ▶ Acquire target — Click the red reticles to reveal skills
                 </motion.p>
               </div>
             )}

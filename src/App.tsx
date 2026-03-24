@@ -8,7 +8,6 @@ import { ProjectsBoard } from './components/ProjectsBoard';
 import { TrainingTimeline as TrainingCinematic } from './components/TrainingCinematic';
 import { EducationTimeline } from './components/Timeline';
 import { Certifications, Achievements, ExtraActivities } from './components/MoreSections';
-import { CyberAvatar } from './components/CyberAvatar';
 import { CursorGlow } from './components/CursorGlow';
 import { MatrixRain } from './components/MatrixRain';
 import { AcademicTimeline } from './components/AcademicTimeline';
@@ -71,7 +70,6 @@ function App() {
           </Routes>
         </main>
 
-        <CyberAvatar />
         <CursorGlow />
       </div>
     </BrowserRouter>

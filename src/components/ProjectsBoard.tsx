@@ -15,6 +15,7 @@ const PROJECTS = [
     modalTags: ['Live backend', 'Full-Stack', 'WAF Bypass', 'Cybersecurity'],
     modalDesc: 'A full-stack cybersecurity reconnaissance tool with a live Python/Flask cloud backend that dynamically connects to external targets for real-time intelligence gathering. Features a cinematic Matrix-style UI and sophisticated WAF evasion logic — using User-Agent rotation and fake-browser header injection to bypass datacenter-level firewalls and retrieve unadulterated intelligence data.',
     terminal: '$ ./cyberecon --target example.com --stealth',
+    imageUrl: 'https://jumpshare.com/s/FaFgLHynj7R7QoIgUOLK',
     github: 'https://github.com/snehachoudhary13/CybeRECON',
     live: 'https://snehachoudhary13.github.io/CybeRECON/',
     icon: 'terminal',
@@ -38,6 +39,7 @@ const PROJECTS = [
       '📊 Trust Score — 0–100 email legitimacy score based on auth results',
       '🏠 Private IP Detection — Identifies internal/local network hops',
     ],
+    imageUrl: 'https://iili.io/q6A9gp4.png',
     github: 'https://github.com/snehachoudhary13/Email-Header-Forensics',
     live: null,
     icon: 'mail',
@@ -94,13 +96,28 @@ export const ProjectsBoard = () => {
             >
               <div className="shimmer-overlay" />
 
-              {/* Visual Icon Block */}
-              <div className="w-full aspect-video bg-[#030712] border border-slate-800 rounded-lg flex items-center justify-center relative overflow-hidden group-hover:border-cyber-primary/50 transition-colors mb-6 shadow-inner">
-                <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCI+CjxyZWN0IHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCIgZmlsbD0ibm9uZSI+PC9yZWN0Pgo8Y2lyY2xlIGN4PSIxMCIgY3k9IjEwIiByPSIxIiBmaWxsPSJyZ2JhKDAsIDIxMiwgMjU1LCAwLjEpIj48L2NpcmNsZT4KPC9zdmc+')] opacity-50" />
-                {project.icon === 'terminal'
-                  ? <Terminal className="w-12 h-12 text-cyber-primary/40 group-hover:text-cyber-primary transition-colors duration-500 group-hover:scale-110 relative z-10" />
-                  : <Mail className="w-12 h-12 text-cyber-warning/40 group-hover:text-cyber-warning transition-colors duration-500 group-hover:scale-110 relative z-10" />
-                }
+              {/* Visual Image Block */}
+              <div className="w-full aspect-video bg-[#030712] border border-slate-800 rounded-lg overflow-hidden group-hover:border-cyber-primary/50 transition-colors mb-6 shadow-inner relative">
+                {'imageUrl' in project && project.imageUrl ? (
+                  <img
+                    src={(project as { imageUrl: string }).imageUrl}
+                    alt={project.title}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    onError={(e) => {
+                      e.currentTarget.style.display = 'none';
+                      e.currentTarget.nextElementSibling?.removeAttribute('hidden');
+                    }}
+                  />
+                ) : null}
+                {/* Fallback icon */}
+                <div className="absolute inset-0 flex items-center justify-center bg-[#030712]"
+                  hidden={('imageUrl' in project && !!project.imageUrl) ? true : undefined}>
+                  <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCI+CjxyZWN0IHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCIgZmlsbD0ibm9uZSI+PC9yZWN0Pgo8Y2lyY2xlIGN4PSIxMCIgY3k9IjEwIiByPSIxIiBmaWxsPSJyZ2JhKDAsIDIxMiwgMjU1LCAwLjEpIj48L2NpcmNsZT4KPC9zdmc+')] opacity-50" />
+                  {project.icon === 'terminal'
+                    ? <Terminal className="w-12 h-12 text-cyber-primary/40 group-hover:text-cyber-primary transition-colors duration-500 group-hover:scale-110 relative z-10" />
+                    : <Mail className="w-12 h-12 text-cyber-warning/40 group-hover:text-cyber-warning transition-colors duration-500 group-hover:scale-110 relative z-10" />
+                  }
+                </div>
                 <div className="absolute bottom-0 left-0 w-full h-[2px] bg-cyber-primary scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-700" />
               </div>
 
