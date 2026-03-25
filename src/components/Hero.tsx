@@ -1,6 +1,7 @@
 ﻿import { motion } from 'framer-motion';
 import { Terminal, Github, Linkedin, Download, ChevronDown } from 'lucide-react';
 import { playHoverSound, playClickSound } from '../utils/sounds';
+import heroProfile from '../assets/hero-profile.jpeg';
 
 export const Hero = () => {
   return (
@@ -37,7 +38,9 @@ export const Hero = () => {
 
             <div className="mb-8 flex flex-wrap gap-4 text-sm md:text-base">
               <a
-                href="#"
+                href="https://pdflink.to/13d6cdd8/"
+                target="_blank"
+                rel="noopener noreferrer"
                 onMouseEnter={playHoverSound}
                 onClick={playClickSound}
                 className="flex items-center gap-2 rounded border border-cyber-primary bg-cyber-primary/10 px-6 py-3 font-mono font-medium text-cyber-primary shadow-glow-primary transition-all duration-300 hover:bg-cyber-primary hover:text-cyber-bg"
@@ -78,12 +81,15 @@ export const Hero = () => {
               <div className="absolute inset-16 animate-pulse rounded-full border border-cyber-accent opacity-30" />
 
               <div className="absolute inset-0 flex items-center justify-center">
-                <div className="relative flex h-40 w-40 items-center justify-center overflow-hidden rounded-xl border border-cyber-primary bg-cyber-bg/50 shadow-glow-primary backdrop-blur-md">
-                  <div className="absolute left-0 top-0 h-1 w-full animate-[bounce_3s_infinite] bg-cyber-primary shadow-[0_0_10px_#38bdf8]" />
-
-                  <div className="text-center font-mono">
-                    <div className="mb-2 text-sm text-cyber-primary opacity-70">STATUS:</div>
-                    <div className="animate-pulse text-xl font-bold text-cyber-accent">SECURE</div>
+                <div className="relative flex h-44 w-44 items-center justify-center rounded-full border border-cyber-primary/70 bg-cyber-bg/50 shadow-glow-primary backdrop-blur-md">
+                  <div className="absolute inset-0 rounded-full border border-cyber-primary/30" />
+                  <div className="absolute left-0 top-0 h-1 w-full animate-[bounce_3s_infinite] rounded-full bg-cyber-primary shadow-[0_0_10px_#38bdf8]" />
+                  <div className="absolute inset-[14px] overflow-hidden rounded-full border-2 border-cyber-accent/70 shadow-[0_0_24px_rgba(45,212,191,0.35)]">
+                    <img
+                      src={heroProfile}
+                      alt="Sneha Choudhary profile"
+                      className="h-full w-full object-cover"
+                    />
                   </div>
                 </div>
               </div>
