@@ -3,11 +3,9 @@ import { Navigation } from './components/Navigation';
 import { ParticleBackground } from './components/ParticleBackground';
 import { Hero } from './components/Hero';
 import { SkillsGrid } from './components/SkillsGrid';
-import { SkillRadar } from './components/SkillRadar';
 import { ProjectsBoard } from './components/ProjectsBoard';
 import { TrainingTimeline as TrainingCinematic } from './components/TrainingCinematic';
-import { EducationTimeline } from './components/Timeline';
-import { Certifications, Achievements, ExtraActivities } from './components/MoreSections';
+import { Certifications, Achievements } from './components/MoreSections';
 import { CursorGlow } from './components/CursorGlow';
 import { MatrixRain } from './components/MatrixRain';
 import { AcademicTimeline } from './components/AcademicTimeline';
@@ -24,7 +22,6 @@ const DashboardView = () => (
 const SkillsView = () => (
   <>
     <SkillsGrid />
-    <SkillRadar />
   </>
 );
 
@@ -37,7 +34,6 @@ const ModulesView = () => (
 const ActivityView = () => (
   <>
     <TrainingCinematic />
-    <EducationTimeline />
   </>
 );
 
@@ -45,7 +41,6 @@ const VerificationView = () => (
   <>
     <Certifications />
     <Achievements />
-    <ExtraActivities />
   </>
 );
 

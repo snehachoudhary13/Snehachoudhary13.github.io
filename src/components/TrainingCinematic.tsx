@@ -1,151 +1,132 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
-import { motion, AnimatePresence, useInView } from 'framer-motion';
-import { Lock, Unlock, ShieldCheck, Star, Zap, Medal } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { AnimatePresence, motion, useInView } from 'framer-motion';
+import { Lock, Medal, ShieldCheck, Star, Unlock } from 'lucide-react';
 
-// ─────────────────────── SOUND ───────────────────────────────────────────────
-const audioCx = typeof window !== 'undefined' ? new (window.AudioContext || (window as any).webkitAudioContext)() : null;
+const AudioCtor =
+  typeof window !== 'undefined'
+    ? window.AudioContext ||
+      (window as Window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext
+    : undefined;
+
+const audioCx = AudioCtor ? new AudioCtor() : null;
+
 const playDing = () => {
   if (!audioCx) return;
   const osc = audioCx.createOscillator();
   const gain = audioCx.createGain();
-  osc.connect(gain); gain.connect(audioCx.destination);
-  osc.type = 'sine'; osc.frequency.setValueAtTime(880, audioCx.currentTime);
+  osc.connect(gain);
+  gain.connect(audioCx.destination);
+  osc.type = 'sine';
+  osc.frequency.setValueAtTime(880, audioCx.currentTime);
   osc.frequency.exponentialRampToValueAtTime(1200, audioCx.currentTime + 0.15);
   gain.gain.setValueAtTime(0.3, audioCx.currentTime);
   gain.gain.exponentialRampToValueAtTime(0.001, audioCx.currentTime + 0.6);
-  osc.start(); osc.stop(audioCx.currentTime + 0.6);
+  osc.start();
+  osc.stop(audioCx.currentTime + 0.6);
 };
 
-// ─────────────────────── DATA ────────────────────────────────────────────────
 const MISSIONS = [
   {
     id: 'nginx',
     title: 'NGINX Deployment',
     dir: 'left' as const,
-    icon: '🌐',
-    badge: 'NGINX Deployed!',
-    xp: 150,
+    badge: 'NGINX Deployed',
     color: '#38bdf8',
-    desc: 'Deployed NGINX inside a Docker container with reverse proxy, GZIP compression, and virtual host configuration. Verified HTTP via internal curl tests.',
+    desc: 'Deployed NGINX inside Docker with reverse proxy, GZIP compression, and virtual host configuration.',
     tools: ['Docker', 'NGINX', 'Linux Networking'],
   },
   {
     id: 'firewall',
     title: 'Firewall Configuration',
     dir: 'right' as const,
-    icon: '🔥',
-    badge: 'Firewall Secured!',
-    xp: 200,
+    badge: 'Firewall Secured',
     color: '#818cf8',
-    desc: 'Applied UFW with a default DENY policy. Whitelisted SSH port 22 and HTTP port 80. Confirmed rule enforcement with nmap port scans.',
+    desc: 'Applied UFW with a default deny policy and verified access rules with scan validation.',
     tools: ['UFW', 'iptables', 'nmap'],
   },
   {
     id: 'users',
-    title: 'User & Process Management',
+    title: 'User and Process Management',
     dir: 'left' as const,
-    icon: '👤',
-    badge: 'Access Granted!',
-    xp: 175,
+    badge: 'Access Granted',
     color: '#a78bfa',
-    desc: 'Created system users with least-privilege sudo access. Managed processes via ps, htop, kill, nice. Automated tasks with cron jobs.',
+    desc: 'Created least-privilege users, managed services, and automated recurring tasks with cron.',
     tools: ['Bash', 'cron', 'htop', 'sudoers'],
   },
   {
     id: 'network',
     title: 'Networking Fundamentals',
     dir: 'right' as const,
-    icon: '🔗',
-    badge: 'Network Traced!',
-    xp: 225,
+    badge: 'Network Traced',
     color: '#2dd4bf',
-    desc: 'Configured static IPs, studied OSI model hands-on. Performed packet sniffing with Wireshark. Used traceroute and mtr for route analysis.',
+    desc: 'Worked through packet capture, DNS analysis, route tracing, and static network configuration.',
     tools: ['Wireshark', 'netstat', 'traceroute', 'DNS'],
   },
 ];
 
-const TOTAL_XP = MISSIONS.reduce((s, m) => s + m.xp, 0);
+const TRAINING_CERTIFICATE = {
+  title: 'Linux Training Certificate',
+  image:
+    'https://pub-1407f82391df4ab1951418d04be76914.r2.dev/uploads/73737ed0-0c87-44c6-99a3-73fa8778ebad.png',
+};
 
-// ─────────────────────── ACHIEVEMENT TOAST ───────────────────────────────────
-interface Toast { id: string; text: string; xp: number; color: string }
+interface Toast {
+  id: string;
+  text: string;
+  color: string;
+}
 
 const AchievementToast = ({ toast, onDone }: { toast: Toast; onDone: () => void }) => {
   useEffect(() => {
-    const t = setTimeout(onDone, 3000);
-    return () => clearTimeout(t);
+    const timeoutId = setTimeout(onDone, 3000);
+    return () => clearTimeout(timeoutId);
   }, [onDone]);
+
   return (
     <motion.div
       initial={{ x: 120, opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
       exit={{ x: 120, opacity: 0 }}
       transition={{ type: 'spring', damping: 18 }}
-      className="flex items-center gap-3 bg-[#0d1117] border rounded-lg px-5 py-3 shadow-2xl"
+      className="flex items-center gap-3 rounded-lg border bg-[#0d1117] px-5 py-3 shadow-2xl"
       style={{ borderColor: toast.color, boxShadow: `0 0 20px ${toast.color}40` }}
     >
-      <Star className="w-5 h-5 shrink-0" style={{ color: toast.color }} />
+      <Star className="h-5 w-5 shrink-0" style={{ color: toast.color }} />
       <div>
-        <p className="text-[10px] font-mono tracking-widest text-slate-400 uppercase">Achievement Unlocked</p>
+        <p className="text-[10px] font-mono uppercase tracking-widest text-slate-400">
+          Achievement Unlocked
+        </p>
         <p className="text-sm font-mono font-bold text-white">{toast.text}</p>
       </div>
     </motion.div>
   );
 };
 
-// ─────────────────────── XP BAR ──────────────────────────────────────────────
-const XPBar = ({ earned, total, levelUp }: { earned: number; total: number; levelUp: boolean }) => {
-  const pct = Math.min((earned / total) * 100, 100);
-  return (
-    <div className="mb-12">
-      <div className="flex justify-between items-center mb-2">
-        <span className="font-mono text-xs text-slate-400 uppercase tracking-widest">Field Operative XP</span>
-        <span className="font-mono text-xs text-cyber-primary">{earned} / {total} XP</span>
-      </div>
-      <div className="h-4 bg-slate-800 rounded-full overflow-hidden relative">
-        <motion.div
-          className="h-full rounded-full"
-          style={{ background: 'linear-gradient(90deg,#818cf8,#38bdf8,#2dd4bf)', boxShadow: '0 0 12px #38bdf840' }}
-          animate={{ width: `${pct}%` }}
-          transition={{ duration: 0.6, ease: 'easeOut' }}
-        />
-        {/* scanline shimmer */}
-        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent animate-[shimmer_2s_infinite] pointer-events-none" />
-      </div>
-      <AnimatePresence>
-        {levelUp && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.7 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="mt-3 flex items-center justify-center gap-3"
-          >
-            <Zap className="w-5 h-5 text-yellow-400" />
-            <span className="font-mono text-lg font-bold text-yellow-400 tracking-widest drop-shadow-[0_0_10px_#facc15]">
-              ⬆ LEVEL UP!
-            </span>
-            <Zap className="w-5 h-5 text-yellow-400" />
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
-  );
-};
-
-// ─────────────────────── MISSION CARD ────────────────────────────────────────
 const MissionCard = ({
-  mission, index, onUnlock,
+  mission,
+  index,
+  onUnlock,
+  activeMission,
+  onSelect,
 }: {
-  mission: typeof MISSIONS[0]; index: number; onUnlock: (m: typeof MISSIONS[0]) => void;
+  mission: (typeof MISSIONS)[number];
+  index: number;
+  onUnlock: (mission: (typeof MISSIONS)[number]) => void;
+  activeMission: string | null;
+  onSelect: (missionId: string | null) => void;
 }) => {
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true, margin: '-80px' });
-  const [unlocked, setUnlocked] = useState(false);
+  const [unlocked, setUnlocked] = useState(true);
   const [flashing, setFlashing] = useState(false);
   const notified = useRef(false);
+  const isActive = activeMission === mission.id;
+  const isDimmed = activeMission !== null && activeMission !== mission.id;
 
   useEffect(() => {
     if (inView && !unlocked && !notified.current) {
       notified.current = true;
-      const t = setTimeout(() => {
+      const timeoutId = setTimeout(() => {
         setFlashing(true);
         setTimeout(() => {
           setFlashing(false);
@@ -153,9 +134,9 @@ const MissionCard = ({
           onUnlock(mission);
         }, 500);
       }, index * 300 + 600);
-      return () => clearTimeout(t);
+      return () => clearTimeout(timeoutId);
     }
-  }, [inView]);
+  }, [inView, unlocked, mission, onUnlock, index]);
 
   const fromX = mission.dir === 'left' ? -80 : 80;
 
@@ -163,11 +144,25 @@ const MissionCard = ({
     <motion.div
       ref={ref}
       initial={{ opacity: 0, x: fromX, filter: 'blur(8px)' }}
-      animate={inView ? { opacity: 1, x: 0, filter: 'blur(0px)' } : {}}
+      animate={
+        inView
+          ? {
+              opacity: isDimmed ? 0.32 : 1,
+              x: 0,
+              filter: isDimmed ? 'blur(6px)' : 'blur(0px)',
+              scale: isActive ? 1.03 : 1,
+            }
+          : {}
+      }
       transition={{ duration: 0.7, delay: index * 0.15, ease: 'easeOut' }}
+      onClick={() => {
+        if (unlocked) {
+          onSelect(isActive ? null : mission.id);
+        }
+      }}
       className="relative"
+      style={{ zIndex: isActive ? 20 : 10 }}
     >
-      {/* White flash on unlock */}
       <AnimatePresence>
         {flashing && (
           <motion.div
@@ -175,72 +170,98 @@ const MissionCard = ({
             animate={{ opacity: 0 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.5 }}
-            className="absolute inset-0 rounded-xl z-30 pointer-events-none"
+            className="pointer-events-none absolute inset-0 z-30 rounded-xl"
             style={{ background: mission.color, mixBlendMode: 'screen' }}
           />
         )}
       </AnimatePresence>
 
       <div
-        className="glass-panel p-6 overflow-hidden relative transition-all duration-500"
-        style={unlocked
-          ? { borderColor: `${mission.color}60`, boxShadow: `0 0 20px ${mission.color}20` }
-          : { borderColor: '#1e293b' }
+        className="glass-panel relative overflow-hidden p-6 transition-all duration-500"
+        style={
+          unlocked
+            ? {
+                borderColor: isActive ? `${mission.color}90` : `${mission.color}60`,
+                boxShadow: isActive
+                  ? `0 0 40px ${mission.color}35`
+                  : `0 0 20px ${mission.color}20`,
+              }
+            : { borderColor: '#1e293b' }
         }
       >
-        {/* Header row */}
-        <div className="flex items-center gap-3 mb-4">
-          <div className="text-2xl">{mission.icon}</div>
-          <h3 className="font-mono text-lg font-bold text-slate-100 flex-1">{mission.title}</h3>
-          <motion.div animate={unlocked ? { rotate: [0, -20, 15, 0], scale: [1, 1.4, 1] } : {}} transition={{ duration: 0.5 }}>
-            {unlocked
-              ? <Unlock className="w-5 h-5" style={{ color: mission.color }} />
-              : <Lock className="w-5 h-5 text-slate-600" />
-            }
+        <div className="mb-4 flex items-center gap-3">
+          <div
+            className="rounded border px-2 py-1 text-[10px] font-mono uppercase tracking-[0.2em]"
+            style={{
+              borderColor: `${mission.color}50`,
+              color: mission.color,
+              background: `${mission.color}10`,
+            }}
+          >
+            Mission
+          </div>
+          <h3 className="flex-1 font-mono text-lg font-bold text-slate-100">{mission.title}</h3>
+          <motion.div
+            animate={unlocked ? { rotate: [0, -20, 15, 0], scale: [1, 1.4, 1] } : {}}
+            transition={{ duration: 0.5 }}
+          >
+            {unlocked ? (
+              <Unlock className="h-5 w-5" style={{ color: mission.color }} />
+            ) : (
+              <Lock className="h-5 w-5 text-slate-600" />
+            )}
           </motion.div>
         </div>
 
-        {/* Blurred / revealed content */}
         <motion.div
           animate={{ filter: unlocked ? 'blur(0px)' : 'blur(5px)', opacity: unlocked ? 1 : 0.3 }}
           transition={{ duration: 0.6 }}
         >
-          <p className="text-sm text-slate-300 leading-relaxed mb-4">{mission.desc}</p>
+          <p className="mb-4 text-sm leading-relaxed text-slate-300">{mission.desc}</p>
           <div className="flex flex-wrap gap-2">
-            {mission.tools.map(t => (
-              <span key={t}
-                className="text-[11px] font-mono px-2 py-0.5 rounded border"
-                style={{ borderColor: `${mission.color}50`, color: mission.color, background: `${mission.color}10` }}
+            {mission.tools.map((tool) => (
+              <span
+                key={tool}
+                className="rounded border px-2 py-0.5 text-[11px] font-mono"
+                style={{
+                  borderColor: `${mission.color}50`,
+                  color: mission.color,
+                  background: `${mission.color}10`,
+                }}
               >
-                {t}
+                {tool}
               </span>
             ))}
           </div>
         </motion.div>
 
-        {/* Locked overlay */}
         <AnimatePresence>
           {!unlocked && (
-            <motion.div exit={{ opacity: 0 }} className="absolute inset-0 flex items-center justify-center rounded-xl bg-slate-900/30 pointer-events-none">
+            <motion.div
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 flex items-center justify-center rounded-xl bg-slate-900/30"
+            >
               <div className="text-center">
-                <Lock className="w-8 h-8 text-slate-600 mx-auto mb-2" />
-                <p className="text-xs font-mono text-slate-600 tracking-widest">CLASSIFIED</p>
+                <Lock className="mx-auto mb-2 h-8 w-8 text-slate-600" />
+                <p className="text-xs font-mono tracking-widest text-slate-600">CLASSIFIED</p>
               </div>
             </motion.div>
           )}
         </AnimatePresence>
 
-        {/* Mission objective checker */}
         {unlocked && (
           <motion.div
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
-            className="flex items-center gap-2 mt-4 border-t border-slate-800 pt-3"
+            className="mt-4 flex items-center gap-2 border-t border-slate-800 pt-3"
           >
-            <ShieldCheck className="w-4 h-4" style={{ color: mission.color }} />
-            <span className="text-[11px] font-mono tracking-widest uppercase" style={{ color: mission.color }}>
-              OBJECTIVE COMPLETE
+            <ShieldCheck className="h-4 w-4" style={{ color: mission.color }} />
+            <span
+              className="text-[11px] font-mono uppercase tracking-widest"
+              style={{ color: mission.color }}
+            >
+              Objective Complete
             </span>
           </motion.div>
         )}
@@ -249,7 +270,6 @@ const MissionCard = ({
   );
 };
 
-// ─────────────────────── RANK BADGE ──────────────────────────────────────────
 const RankBadge = ({ show }: { show: boolean }) => (
   <AnimatePresence>
     {show && (
@@ -262,33 +282,37 @@ const RankBadge = ({ show }: { show: boolean }) => (
         <motion.div
           animate={{ boxShadow: ['0 0 20px #38bdf840', '0 0 60px #38bdf880', '0 0 20px #38bdf840'] }}
           transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
-          className="w-32 h-32 rounded-full bg-cyber-bg border-4 border-cyber-primary flex items-center justify-center"
+          className="flex h-32 w-32 items-center justify-center rounded-full border-4 border-cyber-primary bg-cyber-bg"
         >
-          <Medal className="w-14 h-14 text-cyber-primary" />
+          <Medal className="h-14 w-14 text-cyber-primary" />
         </motion.div>
 
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }}>
-          <p className="text-[10px] font-mono text-slate-500 tracking-[0.4em] uppercase mb-1">Rank Achieved</p>
-          <h3 className="text-2xl md:text-3xl font-mono font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyber-primary to-cyber-secondary text-glow">
+          <p className="mb-1 text-[10px] font-mono uppercase tracking-[0.4em] text-slate-500">
+            Rank Achieved
+          </p>
+          <h3 className="text-2xl font-mono font-bold text-transparent text-glow bg-gradient-to-r from-cyber-primary to-cyber-secondary bg-clip-text md:text-3xl">
             Linux Administrator
           </h3>
-          <p className="text-sm font-mono text-slate-400 mt-1 tracking-widest">CERTIFIED FIELD OPERATIVE · LPU 2025</p>
+          <p className="mt-1 text-sm font-mono tracking-widest text-slate-400">
+            Summer Training - LPU 2025
+          </p>
         </motion.div>
 
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1.2 }}
-          className="flex gap-1 mt-2"
+          className="mt-2 flex gap-1"
         >
-          {[...Array(5)].map((_, i) => (
+          {[...Array(5)].map((_, index) => (
             <motion.div
-              key={i}
+              key={index}
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
-              transition={{ delay: 1.2 + i * 0.1 }}
+              transition={{ delay: 1.2 + index * 0.1 }}
             >
-              <Star className="w-5 h-5 text-yellow-400 fill-yellow-400 drop-shadow-[0_0_6px_#facc15]" />
+              <Star className="h-5 w-5 fill-yellow-400 text-yellow-400 drop-shadow-[0_0_6px_#facc15]" />
             </motion.div>
           ))}
         </motion.div>
@@ -297,116 +321,113 @@ const RankBadge = ({ show }: { show: boolean }) => (
   </AnimatePresence>
 );
 
-// ─────────────────────── MAIN EXPORT ─────────────────────────────────────────
 export const TrainingTimeline = () => {
-  const [declassified, setDeclassified] = useState(false);
+  const [activeMission, setActiveMission] = useState<string | null>(null);
   const [toasts, setToasts] = useState<Toast[]>([]);
-  const [earnedXP, setEarnedXP] = useState(0);
-  const [levelUp, setLevelUp] = useState(false);
-  const [rankShown, setRankShown] = useState(false);
+  const [rankShown, setRankShown] = useState(true);
   const unlockedCount = useRef(0);
-  const sectionRef = useRef<HTMLElement>(null);
-  const inView = useInView(sectionRef, { once: true, margin: '-100px' });
 
-  // Trigger mission declassification
-  useEffect(() => {
-    if (inView && !declassified) {
-      const t = setTimeout(() => setDeclassified(true), 800);
-      return () => clearTimeout(t);
-    }
-  }, [inView, declassified]);
-
-  const handleUnlock = useCallback((mission: typeof MISSIONS[0]) => {
+  const handleUnlock = (mission: (typeof MISSIONS)[number]) => {
     playDing();
-    setToasts(prev => [...prev, { id: mission.id, text: mission.badge, xp: mission.xp, color: mission.color }]);
-    setEarnedXP(prev => {
-      const next = prev + mission.xp;
-      if (next >= TOTAL_XP) {
-        setTimeout(() => setLevelUp(true), 600);
-        setTimeout(() => setRankShown(true), 1800);
-      }
-      return next;
-    });
-    unlockedCount.current++;
-  }, []);
+    setToasts((prev) => [...prev, { id: mission.id, text: mission.badge, color: mission.color }]);
+    unlockedCount.current += 1;
+    if (unlockedCount.current >= MISSIONS.length) {
+      setTimeout(() => setRankShown(true), 800);
+    }
+  };
 
-  const removeToast = useCallback((id: string) => {
-    setToasts(prev => prev.filter(t => t.id !== id));
-  }, []);
+  const removeToast = (id: string) => {
+    setToasts((prev) => prev.filter((toast) => toast.id !== id));
+  };
 
   return (
-    <section ref={sectionRef} id="training" className="py-20 relative z-10 w-full bg-cyber-bg/50 overflow-hidden">
-
-      {/* ── MISSION BRIEFING OVERLAY ─────────────────────────────── */}
-      <AnimatePresence>
-        {!declassified && (
-          <motion.div
-            exit={{ opacity: 0 }}
-            transition={{ duration: 1 }}
-            className="absolute inset-0 z-50 bg-[#020609]/90 backdrop-blur-sm flex flex-col items-center justify-center gap-6 pointer-events-none"
-          >
-            <motion.div
-              initial={{ scale: 2, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ duration: 0.5 }}
-              className="border-4 border-red-500/70 px-8 py-4 rotate-[-2deg]"
-              style={{ boxShadow: '0 0 40px rgba(239,68,68,0.3)' }}
-            >
-              <p className="font-mono text-3xl font-black text-red-500/80 tracking-[0.3em]">TOP SECRET</p>
-            </motion.div>
-            <p className="font-mono text-slate-400 text-sm tracking-widest animate-pulse">DECLASSIFYING...</p>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* ── ACHIEVEMENT TOASTS ────────────────────────────────────── */}
-      <div className="fixed top-24 right-4 z-[200] flex flex-col gap-3 pointer-events-none">
+    <section id="training" className="relative z-10 w-full overflow-hidden bg-cyber-bg/50 py-20">
+      <div className="fixed right-4 top-24 z-[200] flex flex-col gap-3 pointer-events-none">
         <AnimatePresence>
-          {toasts.map(t => (
-            <AchievementToast key={t.id} toast={t} onDone={() => removeToast(t.id)} />
+          {toasts.map((toast) => (
+            <AchievementToast key={toast.id} toast={toast} onDone={() => removeToast(toast.id)} />
           ))}
         </AnimatePresence>
       </div>
 
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* ── SECTION HEADING ─── cinematic drop */}
+      <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: -60, filter: 'blur(12px)' }}
-          animate={declassified ? { opacity: 1, y: 0, filter: 'blur(0px)' } : {}}
+          whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+          viewport={{ once: true }}
           transition={{ duration: 0.9, ease: 'easeOut' }}
           className="mb-12"
         >
-          <div className="flex items-center gap-4 mb-2">
-            <h2 className="text-3xl md:text-4xl font-mono font-bold text-slate-100 text-glow glitch" data-text="Activity Timeline">
+          <div className="mb-2 flex items-center gap-4">
+            <h2
+              className="glitch text-3xl font-mono font-bold text-slate-100 text-glow md:text-4xl"
+              data-text="Activity Timeline"
+            >
               Activity Timeline
             </h2>
-            <div className="h-px bg-cyber-secondary/30 flex-1" />
+            <div className="h-px flex-1 bg-cyber-secondary/30" />
             <motion.span
               initial={{ opacity: 0, scale: 0 }}
-              animate={declassified ? { opacity: 1, scale: 1 } : {}}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
               transition={{ delay: 0.8 }}
-              className="font-mono text-[10px] font-bold tracking-[0.3em] border border-green-500/60 text-green-400 px-3 py-1 rounded-full bg-green-500/10"
+              className="rounded-full border border-green-500/60 bg-green-500/10 px-3 py-1 text-[10px] font-mono font-bold tracking-[0.3em] text-green-400"
             >
-              ✓ TRAINING COMPLETE
+              TRAINING COMPLETE
             </motion.span>
           </div>
-          <p className="text-slate-400 font-mono text-sm uppercase tracking-widest pl-2 border-l-2 border-cyber-secondary">
-            Summer Training · Lovely Professional University · June–July 2025
+          <p className="border-l-2 border-cyber-secondary pl-2 text-sm font-mono uppercase tracking-widest text-slate-400">
+            Summer Training - Lovely Professional University - June to July 2025
           </p>
         </motion.div>
-
-        {/* ── XP BAR ─────────────────────────────────────────────── */}
-        <XPBar earned={earnedXP} total={TOTAL_XP} levelUp={levelUp} />
-
-        {/* ── MISSION CARDS ────────────────────────────────────────── */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {MISSIONS.map((m, i) => (
-            <MissionCard key={m.id} mission={m} index={i} onUnlock={handleUnlock} />
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+          {MISSIONS.map((mission, index) => (
+            <MissionCard
+              key={mission.id}
+              mission={mission}
+              index={index}
+              onUnlock={handleUnlock}
+              activeMission={activeMission}
+              onSelect={setActiveMission}
+            />
           ))}
         </div>
 
-        {/* ── RANK BADGE ───────────────────────────────────────────── */}
         <RankBadge show={rankShown} />
+
+        <motion.div
+          initial={{ opacity: 0, y: 32 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.7, ease: 'easeOut', delay: 0.15 }}
+          className="mx-auto mt-24 max-w-3xl"
+        >
+          <div className="glass-panel relative overflow-hidden rounded-2xl border border-cyber-primary/20 bg-cyber-panel/80 p-5 sm:p-6">
+            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(56,189,248,0.12),transparent_35%),radial-gradient(circle_at_bottom_left,rgba(129,140,248,0.08),transparent_35%)]" />
+            <div className="relative z-10 mb-4 text-center">
+              <p className="text-[10px] font-mono uppercase tracking-[0.35em] text-cyber-primary/80">
+                Final Record
+              </p>
+              <h3 className="mt-2 text-xl font-mono font-bold text-slate-100 sm:text-2xl">
+                {TRAINING_CERTIFICATE.title}
+              </h3>
+            </div>
+
+            <motion.div
+              animate={{ y: [0, -10, 0], x: [0, 4, 0], rotate: [0, 0.8, -0.6, 0] }}
+              transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut' }}
+              className="relative z-10"
+            >
+              <div className="overflow-hidden rounded-xl border border-slate-700/70 bg-[#040912] shadow-[0_0_45px_rgba(56,189,248,0.14)]">
+                <img
+                  src={TRAINING_CERTIFICATE.image}
+                  alt={TRAINING_CERTIFICATE.title}
+                  className="h-auto w-full object-cover"
+                />
+              </div>
+            </motion.div>
+          </div>
+        </motion.div>
       </div>
     </section>
   );

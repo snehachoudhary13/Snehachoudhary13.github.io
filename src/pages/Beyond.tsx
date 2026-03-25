@@ -1,4 +1,4 @@
-import { Achievements, ExtraActivities } from '../components/MoreSections';
+import { Achievements } from '../components/MoreSections';
 
 export const Beyond = () => {
   return (
@@ -13,7 +13,6 @@ export const Beyond = () => {
 
       <div className="space-y-12">
         <Achievements />
-        <ExtraActivities />
       </div>
     </div>
   );

@@ -1,26 +1,62 @@
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown, Leaf, Monitor, Users, Calendar, Zap, Heart } from 'lucide-react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { Calendar, ChevronDown, Leaf, Monitor, Users, Zap } from 'lucide-react';
+import wasteWarriorsField from '../assets/waste-warriors-field.jpg';
 
-// ── Waste Warriors Data ──────────────────────────────────────────────────────
-const NGO_MODULES = [
-  { id: 'waste', icon: <Leaf className="w-5 h-5" />, title: 'Waste Collection Drives', desc: 'Participated in community-wide waste pickup drives, coordinating with volunteers to clean public spaces and promote responsible disposal.' },
-  { id: 'campaigns', icon: <Zap className="w-5 h-5" />, title: 'Awareness Campaigns', desc: 'Designed and conducted public awareness sessions on waste segregation, plastic reduction, and sustainable living practices.' },
-  { id: 'teaching', icon: <Users className="w-5 h-5" />, title: 'Teaching Children', desc: 'Led interactive environmental education sessions for school children — making sustainability fun, relatable, and actionable.' },
-  { id: 'sustainability', icon: <Leaf className="w-5 h-5" />, title: 'Sustainability Initiatives', desc: 'Collaborated on tree plantation drives and composting pilot programs to build long-term ecological impact in local communities.' },
-  { id: 'mental', icon: <Heart className="w-5 h-5" />, title: 'Mental Health Sessions', desc: 'Supported team-run mental wellness workshops, recognizing the link between environmental well-being and human mental health.' },
+const NGO_TABS = [
+  {
+    id: 'waste',
+    icon: <Leaf className="h-5 w-5" />,
+    title: 'Waste Collection Drives',
+    desc: 'Joined cleanup drives and on-ground volunteer efforts focused on cleaner public spaces and community participation.',
+  },
+  {
+    id: 'campaigns',
+    icon: <Zap className="h-5 w-5" />,
+    title: 'Awareness Campaigns',
+    desc: 'Supported awareness sessions around sustainability, waste segregation, and responsible environmental action.',
+  },
+  {
+    id: 'teaching',
+    icon: <Users className="h-5 w-5" />,
+    title: 'Teaching Children',
+    desc: 'Contributed to sessions that made environmental education more practical and engaging for students.',
+  },
 ];
 
-// ── Drive Dev Club Data ──────────────────────────────────────────────────────
 const DDEV_TABS = [
-  { id: 'events', icon: <Calendar className="w-5 h-5" />, title: 'Event Management', desc: 'Managed end-to-end logistics for technical workshops and hackathons — from venue setup to participant onboarding and session facilitation.' },
-  { id: 'coord', icon: <Users className="w-5 h-5" />, title: 'Team Coordination', desc: 'Acted as liaison between sub-teams, ensuring smooth communication and task delegation across design, dev, and outreach verticals.' },
-  { id: 'planning', icon: <Zap className="w-5 h-5" />, title: 'Planning & Execution', desc: 'Contributed to strategic planning sessions, building timelines, defining goals, and following through to ensure consistent execution quality.' },
-  { id: 'community', icon: <Monitor className="w-5 h-5" />, title: 'Community Engagement', desc: 'Drove community engagement via social media coordination and post-event follow-ups to grow the club\'s active member base.' },
+  {
+    id: 'events',
+    icon: <Calendar className="h-5 w-5" />,
+    title: 'Event Management',
+    desc: 'Managed logistics for technical workshops and hackathons from setup to participant flow.',
+  },
+  {
+    id: 'coord',
+    icon: <Users className="h-5 w-5" />,
+    title: 'Team Coordination',
+    desc: 'Coordinated communication across design, development, and outreach teams to keep execution aligned.',
+  },
+  {
+    id: 'planning',
+    icon: <Zap className="h-5 w-5" />,
+    title: 'Planning and Execution',
+    desc: 'Helped shape timelines, priorities, and delivery plans so events moved smoothly from idea to launch.',
+  },
+  {
+    id: 'community',
+    icon: <Monitor className="h-5 w-5" />,
+    title: 'Community Engagement',
+    desc: 'Supported outreach and post-event engagement to strengthen the club community and participation.',
+  },
 ];
 
-// ── Expandable Item ──────────────────────────────────────────────────────────
-const ExpandItem = ({ item, accentColor, isOpen, onToggle }: {
+const ExpandItem = ({
+  item,
+  accentColor,
+  isOpen,
+  onToggle,
+}: {
   item: { id: string; icon: React.ReactNode; title: string; desc: string };
   accentColor: string;
   isOpen: boolean;
@@ -28,15 +64,17 @@ const ExpandItem = ({ item, accentColor, isOpen, onToggle }: {
 }) => (
   <div className="border-b border-slate-800 last:border-0">
     <button
-      className="w-full flex items-center justify-between py-3 px-1 text-left group hover:bg-white/3 transition-colors rounded"
+      className="group flex w-full items-center justify-between rounded px-1 py-3 text-left transition-colors hover:bg-white/3"
       onClick={onToggle}
     >
       <div className="flex items-center gap-3">
         <span style={{ color: accentColor }}>{item.icon}</span>
-        <span className="font-mono text-sm text-slate-200 group-hover:text-white transition-colors">{item.title}</span>
+        <span className="font-mono text-sm text-slate-200 transition-colors group-hover:text-white">
+          {item.title}
+        </span>
       </div>
       <motion.div animate={{ rotate: isOpen ? 180 : 0 }} transition={{ duration: 0.2 }}>
-        <ChevronDown className="w-4 h-4 text-slate-500" />
+        <ChevronDown className="h-4 w-4 text-slate-500" />
       </motion.div>
     </button>
     <AnimatePresence>
@@ -48,155 +86,181 @@ const ExpandItem = ({ item, accentColor, isOpen, onToggle }: {
           transition={{ duration: 0.3, ease: 'easeInOut' }}
           className="overflow-hidden"
         >
-          <p className="text-slate-400 font-sans text-sm leading-relaxed pb-3 px-8 pl-11">{item.desc}</p>
+          <p className="pb-3 pl-11 pr-8 text-sm leading-relaxed text-slate-400">{item.desc}</p>
         </motion.div>
       )}
     </AnimatePresence>
   </div>
 );
 
-// ── Main Component ────────────────────────────────────────────────────────────
 export const BeyondSection = () => {
   const [openNgo, setOpenNgo] = useState<string | null>(null);
   const [openDev, setOpenDev] = useState<string | null>(null);
 
-  const toggleNgo = (id: string) => setOpenNgo(prev => prev === id ? null : id);
-  const toggleDev = (id: string) => setOpenDev(prev => prev === id ? null : id);
+  const toggleNgo = (id: string) => {
+    setOpenNgo((prev) => (prev === id ? null : id));
+  };
 
-  const cardVariants = {
-    hidden: { opacity: 0, y: 40 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: 'easeOut' } },
+  const toggleDev = (id: string) => {
+    setOpenDev((prev) => (prev === id ? null : id));
   };
 
   return (
-    <section id="beyond" className="py-20 relative z-10 w-full">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-
-        {/* Section Heading */}
-        <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-4">
-          <div className="inline-flex items-center gap-2 bg-cyber-accent/10 border border-cyber-accent/30 rounded-full px-4 py-1.5 mb-4">
-            <span className="w-2 h-2 rounded-full bg-cyber-accent animate-pulse" />
-            <span className="font-mono text-xs text-cyber-accent tracking-widest uppercase">Beyond Code</span>
+    <section id="beyond" className="relative z-10 w-full py-20">
+      <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="mb-10 text-center"
+        >
+          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-cyber-secondary/30 bg-cyber-secondary/10 px-4 py-1.5">
+            <span className="h-2 w-2 rounded-full bg-cyber-secondary animate-pulse" />
+            <span className="font-mono text-xs uppercase tracking-widest text-cyber-secondary">
+              Beyond Code
+            </span>
           </div>
-          <h2 className="text-3xl md:text-4xl font-mono font-bold text-slate-100 text-glow mb-4">Beyond</h2>
-          <motion.blockquote
-            initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} transition={{ delay: 0.3 }}
-            className="text-slate-400 font-sans italic text-base max-w-xl mx-auto border-l-2 border-cyber-accent/40 pl-4 text-left"
-          >
-            "Beyond code, I build communities and create impact."
-          </motion.blockquote>
+          <h2 className="mb-4 text-3xl font-mono font-bold text-slate-100 text-glow md:text-4xl">
+            Beyond
+          </h2>
+          <p className="mx-auto max-w-2xl text-sm leading-relaxed text-slate-400">
+            Community work, club management, and volunteer impact all stay visible here with the focus kept on real on-ground experience.
+          </p>
         </motion.div>
 
-        <div className="mt-12 grid grid-cols-1 lg:grid-cols-2 gap-8">
-
-          {/* ── Card 1: Waste Warriors NGO ── */}
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
           <motion.div
-            variants={cardVariants}
-            initial="hidden"
-            whileInView="visible"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            whileHover={{ rotateY: 2, rotateX: -1, scale: 1.01, boxShadow: '0 0 40px rgba(34,197,94,0.2)' }}
-            transition={{ type: 'spring', stiffness: 200 }}
-            className="glass-panel p-7 border border-green-500/20 relative overflow-hidden flex flex-col"
-            style={{ background: 'linear-gradient(135deg, rgba(16,40,24,0.8) 0%, rgba(6,10,16,0.9) 100%)' }}
+            className="glass-panel relative overflow-hidden border border-green-500/20 p-7"
+            style={{
+              background: 'linear-gradient(135deg, rgba(16,40,24,0.82) 0%, rgba(6,10,16,0.94) 100%)',
+            }}
           >
-            {/* Floating leaf decorations */}
-            {['🍃', '🌿', '🍀'].map((leaf, i) => (
-              <motion.span
-                key={leaf}
-                className="absolute text-xl pointer-events-none select-none opacity-10"
-                style={{ top: `${20 + i * 28}%`, right: `${8 + i * 5}%` }}
-                animate={{ y: [0, -12, 0], rotate: [-5, 5, -5] }}
-                transition={{ duration: 3 + i, repeat: Infinity, ease: 'easeInOut', delay: i * 0.7 }}
-              >
-                {leaf}
-              </motion.span>
-            ))}
-
-            {/* Header */}
-            <div className="flex items-start gap-4 mb-6">
-              <div className="w-14 h-14 rounded-xl bg-green-500/15 border border-green-500/30 flex items-center justify-center flex-shrink-0">
-                <span className="text-2xl">🌍</span>
+            <div className="relative z-10 mb-6 flex items-start gap-4">
+              <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-xl border border-green-500/30 bg-green-500/15">
+                <Leaf className="h-7 w-7 text-green-400" />
               </div>
               <div>
-                <h3 className="text-xl font-mono font-bold text-slate-100 mb-1">Waste Warriors NGO</h3>
-                <span className="font-mono text-xs text-green-400 bg-green-500/10 border border-green-500/20 px-2 py-0.5 rounded">
-                  Volunteer / Field Contributor
+                <h3 className="mb-1 text-xl font-mono font-bold text-slate-100">Waste Warriors NGO</h3>
+                <span className="rounded border border-green-500/20 bg-green-500/10 px-2 py-0.5 text-xs font-mono text-green-400">
+                  Volunteer Contributor
                 </span>
               </div>
             </div>
 
-            <p className="text-slate-400 font-sans text-sm leading-relaxed mb-6">
-              Active involvement in grassroots-level environmental and social initiatives — driving real community change through collective action.
+            <div className="relative z-10 mb-5 space-y-4">
+              <div className="relative overflow-hidden rounded-xl border border-green-500/20 bg-[#030712]">
+                <div className="aspect-video w-full">
+                  <img
+                    src={wasteWarriorsField}
+                    alt="Waste Warriors field activity"
+                    className="h-full w-full object-cover"
+                  />
+                </div>
+                <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-[#02060d]/90 to-transparent" />
+                <div className="absolute bottom-3 right-3 rounded border border-green-500/30 bg-black/60 px-2 py-1 text-[10px] font-mono uppercase tracking-widest text-green-300">
+                  Field Work
+                </div>
+              </div>
+
+              <div className="rounded-xl border border-green-500/20 bg-green-500/6 p-4">
+                <p className="text-xs font-mono uppercase tracking-[0.25em] text-green-300/80">
+                  On-ground impact
+                </p>
+                <p className="mt-3 text-sm leading-relaxed text-slate-300">
+                  Cleanup drives, awareness sessions, and practical sustainability work at the community level.
+                </p>
+              </div>
+            </div>
+
+            <p className="relative z-10 mb-6 text-sm leading-relaxed text-slate-400">
+              Grassroots environmental work stays in Beyond with the focus on volunteer contribution and community-level sustainability action.
             </p>
 
-            {/* Expandable modules */}
-            <div className="flex-1 space-y-0 rounded-lg border border-green-500/15 overflow-hidden bg-green-500/3 px-2">
-              {NGO_MODULES.map(m => (
-                <ExpandItem key={m.id} item={m} accentColor="#22c55e" isOpen={openNgo === m.id} onToggle={() => toggleNgo(m.id)} />
+            <div className="relative z-10 space-y-0 overflow-hidden rounded-lg border border-green-500/15 bg-green-500/5 px-2">
+              {NGO_TABS.map((tab) => (
+                <ExpandItem
+                  key={tab.id}
+                  item={tab}
+                  accentColor="#4ade80"
+                  isOpen={openNgo === tab.id}
+                  onToggle={() => toggleNgo(tab.id)}
+                />
               ))}
             </div>
 
-            {/* Impact tags */}
-            <div className="flex flex-wrap gap-2 mt-5">
-              {['Community Impact', 'Environmental Action', 'Volunteer'].map(tag => (
-                <span key={tag} className="px-3 py-1 text-xs font-mono rounded-full border border-green-500/30 text-green-400 bg-green-500/8">
+            <div className="relative z-10 mt-5 flex flex-wrap items-center gap-2">
+              {['Community Impact', 'Volunteer', 'Sustainability'].map((tag) => (
+                <span
+                  key={tag}
+                  className="rounded-full border border-green-500/30 bg-green-500/8 px-3 py-1 text-xs font-mono text-green-300"
+                >
                   {tag}
                 </span>
               ))}
             </div>
           </motion.div>
 
-          {/* ── Card 2: Drive Dev Club ── */}
           <motion.div
-            variants={cardVariants}
-            initial="hidden"
-            whileInView="visible"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ delay: 0.15 }}
-            whileHover={{ rotateY: -2, rotateX: -1, scale: 1.01, boxShadow: '0 0 40px rgba(129,140,248,0.25)' }}
-            className="glass-panel p-7 border border-cyber-secondary/20 relative overflow-hidden flex flex-col"
-            style={{ background: 'linear-gradient(135deg, rgba(30,20,60,0.8) 0%, rgba(6,10,16,0.9) 100%)' }}
+            className="glass-panel relative overflow-hidden border border-cyber-secondary/20 p-7"
+            style={{
+              background: 'linear-gradient(135deg, rgba(30,20,60,0.8) 0%, rgba(6,10,16,0.9) 100%)',
+            }}
           >
-            {/* Neon grid background */}
-            <div className="absolute inset-0 opacity-5 pointer-events-none"
-              style={{ backgroundImage: 'linear-gradient(rgba(129,140,248,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(129,140,248,0.5) 1px, transparent 1px)', backgroundSize: '32px 32px' }} />
+            <div
+              className="pointer-events-none absolute inset-0 opacity-5"
+              style={{
+                backgroundImage:
+                  'linear-gradient(rgba(129,140,248,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(129,140,248,0.5) 1px, transparent 1px)',
+                backgroundSize: '32px 32px',
+              }}
+            />
 
-            {/* Header */}
-            <div className="flex items-start gap-4 mb-6 relative z-10">
-              <div className="w-14 h-14 rounded-xl bg-cyber-secondary/15 border border-cyber-secondary/30 flex items-center justify-center flex-shrink-0">
-                <span className="text-2xl">⚙️</span>
+            <div className="relative z-10 mb-6 flex items-start gap-4">
+              <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-xl border border-cyber-secondary/30 bg-cyber-secondary/15">
+                <span className="text-2xl">DEV</span>
               </div>
               <div>
-                <h3 className="text-xl font-mono font-bold text-slate-100 mb-1">Drive Dev Club</h3>
-                <span className="font-mono text-xs text-cyber-secondary bg-cyber-secondary/10 border border-cyber-secondary/20 px-2 py-0.5 rounded">
+                <h3 className="mb-1 text-xl font-mono font-bold text-slate-100">Drive Dev Club</h3>
+                <span className="rounded border border-cyber-secondary/20 bg-cyber-secondary/10 px-2 py-0.5 text-xs font-mono text-cyber-secondary">
                   Management Team Member
                 </span>
               </div>
             </div>
 
-            <p className="text-slate-400 font-sans text-sm leading-relaxed mb-6 relative z-10">
-              Working on the management side of a developer community — organizing, coordinating, and executing technical events with precision.
+            <p className="relative z-10 mb-6 text-sm leading-relaxed text-slate-400">
+              Developer community management work stays here with planning, team coordination, and event execution highlights.
             </p>
 
-            {/* Expandable tabs */}
-            <div className="flex-1 space-y-0 rounded-lg border border-cyber-secondary/15 overflow-hidden bg-cyber-secondary/3 px-2 relative z-10">
-              {DDEV_TABS.map(t => (
-                <ExpandItem key={t.id} item={t} accentColor="#7b2ff7" isOpen={openDev === t.id} onToggle={() => toggleDev(t.id)} />
+            <div className="relative z-10 space-y-0 overflow-hidden rounded-lg border border-cyber-secondary/15 bg-cyber-secondary/3 px-2">
+              {DDEV_TABS.map((tab) => (
+                <ExpandItem
+                  key={tab.id}
+                  item={tab}
+                  accentColor="#7b2ff7"
+                  isOpen={openDev === tab.id}
+                  onToggle={() => toggleDev(tab.id)}
+                />
               ))}
             </div>
 
-            {/* Impact tags */}
-            <div className="flex flex-wrap gap-2 mt-5 relative z-10">
-              {['Leadership', 'Team Management', 'Execution', 'Organizer'].map(tag => (
-                <span key={tag} className="px-3 py-1 text-xs font-mono rounded-full border border-cyber-secondary/30 text-cyber-secondary bg-cyber-secondary/8">
+            <div className="relative z-10 mt-5 flex flex-wrap gap-2">
+              {['Leadership', 'Team Management', 'Execution', 'Organizer'].map((tag) => (
+                <span
+                  key={tag}
+                  className="rounded-full border border-cyber-secondary/30 bg-cyber-secondary/8 px-3 py-1 text-xs font-mono text-cyber-secondary"
+                >
                   {tag}
                 </span>
               ))}
             </div>
           </motion.div>
         </div>
-
       </div>
     </section>
   );

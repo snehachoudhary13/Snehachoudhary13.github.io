@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence, useSpring, useMotionValue } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const MILESTONES = [
   {
@@ -24,7 +24,7 @@ const MILESTONES = [
     location: 'India',
     years: '2021 – 2023',
     stream: 'Science',
-    highlights: ['Student Council Member'],
+    highlights: ['House Captain'],
     color: '#818cf8',
     glow: 'rgba(129,140,248,0.4)',
     avatarScale: 0.85,
@@ -37,7 +37,6 @@ const MILESTONES = [
     school: 'Lovely Professional University',
     location: 'Phagwara, Punjab',
     years: '2023 – Present',
-    cgpa: '8.52 / 10',
     highlights: ['Cybersecurity Club', 'Hackathon Finalist', 'DSA & Networks'],
     color: '#2dd4bf',
     glow: 'rgba(45,212,191,0.4)',
@@ -113,7 +112,6 @@ const LandingParticles = ({ color, active }: { color: string; active: boolean })
 
 export const AcademicTimeline = () => {
   const [activeIdx, setActiveIdx] = useState(0);
-  const [prevIdx, setPrevIdx] = useState(0);
   const [jumping, setJumping] = useState(false);
   const [landed, setLanded] = useState(false);
   const [wakeUp, setWakeUp] = useState(true);
@@ -146,7 +144,6 @@ export const AcademicTimeline = () => {
 
   const goTo = (idx: number) => {
     if (idx === activeIdx || jumping) return;
-    setPrevIdx(activeIdx);
     setJumping(true);
     setLanded(false);
     setTimeout(() => {
@@ -276,9 +273,6 @@ export const AcademicTimeline = () => {
                   </div>
                   <p className="font-mono text-base mb-1" style={{ color: current.color }}>{current.school}</p>
                   <p className="text-slate-500 text-sm mb-4">{current.location} · {current.years}</p>
-                  {'cgpa' in current && (
-                    <p className="text-sm font-mono text-cyber-warning mb-4">CGPA: {current.cgpa}</p>
-                  )}
                   {'stream' in current && (
                     <p className="text-sm font-mono text-slate-400 mb-4">Stream: {current.stream}</p>
                   )}
@@ -364,7 +358,6 @@ export const AcademicTimeline = () => {
                 <h3 className="text-lg font-mono font-bold text-slate-100 mb-1">{m.degree}</h3>
                 <p className="text-sm font-mono mb-1" style={{ color: m.color }}>{m.school}</p>
                 <p className="text-xs text-slate-500 mb-3">{m.location} · {m.years}</p>
-                {'cgpa' in m && <p className="text-xs text-cyber-warning mb-3">CGPA: {m.cgpa}</p>}
                 <div className="flex flex-wrap gap-2">
                   {m.highlights.map(h => (
                     <span key={h} className="text-xs font-mono px-2 py-1 rounded border"
